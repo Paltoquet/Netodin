@@ -9,9 +9,8 @@ import java.util.Arrays;
 public class Main {
 
     public static void main(String [] args){
-
-        Command c = new Add("fdgdf", Arrays.asList("dfgdf", "dfgdf", "aze"));
-        System.out.println(c.toString());
+        Client client=new Client("127.0.0.1",1337);
+        client.run();
     }
 
 }
