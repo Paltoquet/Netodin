@@ -1,7 +1,7 @@
 package interfaces;
 
-/**
- * Created by user on 03/11/2015.
- */
+import org.json.JSONObject;
+
 public interface convertJSON {
+    JSONObject toJSON();
 }
