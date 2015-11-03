@@ -2,6 +2,6 @@ package interfaces;
 
 import org.json.JSONObject;
 
-public interface convertJSON {
+public interface ConvertJSON {
     JSONObject toJSON();
 }
