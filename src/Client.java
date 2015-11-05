@@ -1,5 +1,9 @@
 
 
+import commands.Add;
+import commands.Command;
+import exceptions.CommandException;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -7,6 +11,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.StringTokenizer;
 
 public class Client{
 
@@ -34,8 +39,16 @@ public class Client{
     public void run() {
 
         while (sc.hasNext()) {
-            String commande=getCommand();
-            writer.write(commande);
+            StringTokenizer tokenizer=new StringTokenizer(sc.nextLine());
+            Command commande= null;
+            try {
+                commande = getCommand(tokenizer.nextToken());
+            } catch (CommandException e) {
+                e.printStackTrace();
+            }
+
+            commande.parse(tokenizer);
+            writer.write(commande.toString());
             //TOUJOURS UTILISER flush() POUR ENVOYER RÉELLEMENT DES INFOS AU SERVEUR
             writer.flush();
 
@@ -52,9 +65,13 @@ public class Client{
     }
 
     //Méthode qui permet d'envoyer des commandeS de façon aléatoire
-    private String getCommand(){
-        String commande=sc.nextLine();
-        return commande;
+    private Command getCommand(String cmd) throws CommandException {
+        switch(cmd){
+            case "add":
+                return new Add();
+            default:
+                throw new CommandException("invalid command");
+        }
     }
 
     //Méthode pour lire les réponses du serveur
