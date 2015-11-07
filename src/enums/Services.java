@@ -1,9 +1,7 @@
 package enums;
 
 import exceptions.ServiceException;
-import services.Add;
-import services.List;
-import services.Service;
+import server.modify.Command;
 
 public enum Services {
     ADD, LIST /*, UPDATE, DELETE*/;
@@ -29,18 +27,39 @@ public enum Services {
      * @return an instance of the requested service
      * @throws ServiceException if the service does not exist
      */
-    public static Service getService(String service) throws ServiceException {
+    public static client.services.Service getClientService(String service) throws ServiceException {
         if (!hasService(service)) {
             throw new ServiceException("The requested service doesn't exist");
         }
 
         switch (valueOf(service.toUpperCase())) {
             case ADD:
-                return new Add();
+                return new client.services.AddUser();
             case LIST:
-                return new List();
+                return new client.services.ListUsers();
             default:
-                return null; // only make the shitty compiler happy
+                throw new ServiceException("The requested service doesn't exist"); // only make the shitty compiler happy
+        }
+    }
+
+    /**
+     *
+     * @param service the requested service
+     * @return an instance of the requested service
+     * @throws ServiceException if the service does not exist
+     */
+    public static Command getServerService(String service) throws ServiceException {
+        if (!hasService(service)) {
+            throw new ServiceException("The requested service doesn't exist");
+        }
+
+        switch (valueOf(service.toUpperCase())) {
+            case ADD:
+                return new server.modify.AddUser();
+            case LIST:
+                return new server.modify.ListUsers();
+            default:
+                throw new ServiceException("The requested service doesn't exist"); // only make the shitty compiler happy
         }
     }
 }

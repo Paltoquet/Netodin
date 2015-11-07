@@ -1,27 +1,27 @@
-package net;
+package client;
 
 import enums.Services;
 import exceptions.ConnectionException;
-import services.Add;
-import services.List;
-import services.Service;
+import client.services.Service;
 import exceptions.ServiceException;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
-import static enums.Services.*;
 
-public class Client
-{
-    private Socket connexion;
+public class Client {
+
+    /**
+     * Writing to the server
+     */
     private PrintWriter writer;
-    private BufferedInputStream reader;
-    private Scanner sc;
+
+    /**
+     * Reader from the server
+     */
+    private BufferedReader reader;
 
     /**
      *
@@ -31,24 +31,27 @@ public class Client
      */
     public Client(String host, int port) throws ConnectionException {
         try {
-            connexion = new Socket(host, port);
-            writer = new PrintWriter(connexion.getOutputStream(), true);
-            reader = new BufferedInputStream(connexion.getInputStream());
+            Socket connection = new Socket(host, port);
+            writer = new PrintWriter(connection.getOutputStream(), true);
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         } catch (IOException e) {
            throw new ConnectionException("Unable to establish the connection");
         }
     }
 
+    /**
+     * Run the interaction with the client
+     */
     public void run() {
         showPrompt();
-        sc = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in);
 
         while (sc.hasNext()) {
             StringTokenizer tokenizer = new StringTokenizer(sc.nextLine());
             Service service;
 
             try {
-                service = Services.getService(tokenizer.nextToken());
+                service = Services.getClientService(tokenizer.nextToken());
                 service.initialize(tokenizer);
             } catch (ServiceException e) {
                 System.out.println("Error : " + e.getMessage());
@@ -56,23 +59,24 @@ public class Client
                 continue;
             }
 
-            writer.write(service.toString());
-            writer.flush();
+            writer.println(service.toString());
 
-            //On attend la réponse
-            /*reader.read(blabla)
-            System.out.println( "Réponse reçue " + response);*/
+            try {
+                System.out.println(reader.readLine());
+            } catch (IOException e) {
+                System.err.println("Can't get the response from the server");
+            }
 
             showPrompt();
         }
 
-        writer.flush();
         writer.close();
     }
 
-
-
-
+    /**
+     * After the result of the last command
+     * show a new prompt to the user
+     */
     private void showPrompt() {
         System.out.print(" > ");
         System.out.flush();

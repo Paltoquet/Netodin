@@ -1,7 +1,9 @@
-import exceptions.ConnectionException;
-import net.Client;
+package client;
 
-public class MainClient {
+import exceptions.ConnectionException;
+import client.Client;
+
+public class Main {
 
     public static void main(String [] args){
         try {
