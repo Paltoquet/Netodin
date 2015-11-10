@@ -10,7 +10,8 @@ import util.Users;
 import java.util.List;
 import java.util.Map;
 
-public class Configuration {
+public class Configuration
+{
     /**
      * Map containing users with their nicknames (aliases)
      *

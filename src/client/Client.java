@@ -7,14 +7,11 @@ import exceptions.ServiceException;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Scanner;
-import java.util.StringTokenizer;
 
 
-public class Client {
-
+public class Client
+{
     /**
      * Writing to the server
      */

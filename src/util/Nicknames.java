@@ -29,6 +29,10 @@ public class Nicknames extends ArrayList<String> {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
         if (!(o instanceof Nicknames) || size() != ((Nicknames) o).size()) {
             return false;
         }

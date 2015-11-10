@@ -3,14 +3,11 @@ package client.services;
 import exceptions.ServiceException;
 import org.json.JSONException;
 import org.json.JSONObject;
-import util.User;
 
 import java.util.Scanner;
-import java.util.StringTokenizer;
 
 public class Quit extends Service
 {
-
     @Override
     public void initialize(Scanner sc) throws ServiceException {}
 

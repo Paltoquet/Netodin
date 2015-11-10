@@ -5,8 +5,8 @@ import org.json.JSONObject;
 
 import java.util.Scanner;
 
-public class RemoveUser extends Service {
-
+public class DeleteUser extends Service
+{
     /**
      * The username
      */

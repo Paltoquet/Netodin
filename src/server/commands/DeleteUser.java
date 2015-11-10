@@ -5,7 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import server.Configuration;
 
-public class RemoveUser extends Command
+public class DeleteUser extends Command
 {
     @Override
     public void execute(JSONObject json) {

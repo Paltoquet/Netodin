@@ -13,9 +13,21 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
 
-public class ThreadServer implements Runnable {
+public class ThreadServer implements Runnable
+{
+    /**
+     * The socket of the client
+     */
     private Socket socket;
+
+    /**
+     * The output buffer
+     */
     private PrintWriter out;
+
+    /**
+     * The input buffer
+     */
     private BufferedReader in;
 
     /**

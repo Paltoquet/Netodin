@@ -2,10 +2,8 @@ package client.services;
 
 import exceptions.ServiceException;
 import interfaces.ConvertJSON;
-import org.json.JSONObject;
 
 import java.util.Scanner;
-import java.util.StringTokenizer;
 
 public abstract class Service implements ConvertJSON
 {

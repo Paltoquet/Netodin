@@ -3,14 +3,10 @@ package client.services;
 import exceptions.ServiceException;
 import org.json.JSONException;
 import org.json.JSONObject;
-import util.Nicknames;
-import util.User;
-
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+
+import util.User;
 
 public class AddUser extends Service
 {

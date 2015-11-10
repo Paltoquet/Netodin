@@ -1,6 +1,7 @@
 package enums;
 
 import exceptions.ServiceException;
+import server.commands.DeleteUser;
 
 public enum Services {
     ADD, UPDATE, DELETE, LIST, GETNICKNAMES, QUIT;
@@ -37,7 +38,7 @@ public enum Services {
             case UPDATE:
                 return new client.services.UpdateUser();
             case DELETE:
-                return new client.services.RemoveUser();
+                return new client.services.DeleteUser();
             case LIST:
                 return new client.services.ListUsers();
             case GETNICKNAMES:
@@ -66,7 +67,7 @@ public enum Services {
             case UPDATE:
                 return new server.commands.UpdateUser();
             case DELETE:
-                return new server.commands.RemoveUser();
+                return new DeleteUser();
             case LIST:
                 return new server.commands.ListUsers();
             case GETNICKNAMES:

@@ -19,7 +19,8 @@ import java.util.TreeMap;
 public class Users extends TreeMap<String, Nicknames> {
 
     /**
-     * Case insensitive for the key
+     * Constructor only used to set the
+     * case insensitive for the String key
      */
     public Users() {
         super(String.CASE_INSENSITIVE_ORDER);

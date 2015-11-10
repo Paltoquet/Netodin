@@ -1,12 +1,10 @@
 package server.commands;
 
 import exceptions.ModifyException;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import server.Configuration;
 import util.Nicknames;
-import util.User;
 
 public class GetNicknames extends Command
 {
