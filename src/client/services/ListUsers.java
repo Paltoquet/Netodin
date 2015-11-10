@@ -5,6 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.StringTokenizer;
 
 public class ListUsers extends Service
@@ -29,8 +30,20 @@ public class ListUsers extends Service
     }
 
     @Override
-    public void initialize(StringTokenizer tokenizer) throws ServiceException {
+    public void initialize(Scanner sc) throws ServiceException {
+        System.out.print("Limit (optional) : ");
+        try {
+            limit = Integer.parseInt(sc.nextLine());
+            if (limit < 0) {
+                limit = 0;
+            }
+        } catch (NumberFormatException | NullPointerException ignore) {}
 
+        System.out.print("Start with (spaced by spaces) : ");
+        StringTokenizer tokenizer = new StringTokenizer(sc.nextLine());
+        while (tokenizer.hasMoreTokens()) {
+            startWith.add(tokenizer.nextToken());
+        }
     }
 
     @Override

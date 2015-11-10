@@ -43,22 +43,24 @@ public class Client {
      * Run the interaction with the client
      */
     public void run() {
-        showPrompt();
+        System.out.print("Commande : ");
         Scanner sc = new Scanner(System.in);
 
         while (sc.hasNext()) {
-            StringTokenizer tokenizer = new StringTokenizer(sc.nextLine());
             Service service;
 
             try {
-                service = Services.getClientService(tokenizer.nextToken());
-                service.initialize(tokenizer);
+                service = Services.getClientService(sc.nextLine());
+                service.initialize(sc);
             } catch (ServiceException e) {
-                System.out.println("Error : " + e.getMessage());
-                showPrompt();
+                System.err.println("Error : " + e.getMessage());
+                System.err.flush();
+                System.out.flush();
+                System.out.print("Commande : ");
                 continue;
             }
 
+            System.out.println(service.toString());
             writer.println(service.toString());
 
             try {
@@ -67,18 +69,9 @@ public class Client {
                 System.err.println("Can't get the response from the server");
             }
 
-            showPrompt();
+            System.out.print("Commande : ");
         }
 
         writer.close();
-    }
-
-    /**
-     * After the result of the last command
-     * show a new prompt to the user
-     */
-    private void showPrompt() {
-        System.out.print(" > ");
-        System.out.flush();
     }
 }

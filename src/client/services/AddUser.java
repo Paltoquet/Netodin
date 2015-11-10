@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.StringTokenizer;
 
 public class AddUser extends Service
@@ -30,18 +31,21 @@ public class AddUser extends Service
     }
 
     @Override
-    public void initialize(StringTokenizer tokenizer) throws ServiceException {
-        if (!tokenizer.hasMoreTokens()) {
-            throw new ServiceException("You must supply a name\nExample : ADD name nickname1 nickname2 ...");
+    public void initialize(Scanner sc) throws ServiceException {
+        System.out.print("Name : ");
+        name = sc.nextLine();
+        if (name.isEmpty()) {
+            throw new ServiceException("You must supply a name");
         }
-        name = tokenizer.nextToken();
 
+        System.out.print("Nicknames (spaced by spaces) : ");
+        StringTokenizer tokenizer = new StringTokenizer(sc.nextLine());
         while (tokenizer.hasMoreTokens()) {
             nicknames.add(tokenizer.nextToken());
         }
 
         if (nicknames.size() == 0) {
-            throw new ServiceException("You must supply one or more nicknames\nExample : ADD name nickname1 nickname2 ...");
+            throw new ServiceException("You must supply at least one nickname");
         }
     }
 

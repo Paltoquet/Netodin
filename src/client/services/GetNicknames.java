@@ -1,0 +1,41 @@
+package client.services;
+
+import exceptions.ServiceException;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.StringTokenizer;
+
+public class GetNicknames extends Service
+{
+    /**
+     * The name of the user
+     */
+    private String name;
+
+    @Override
+    public void initialize(Scanner sc) throws ServiceException {
+        System.out.print("Name : ");
+        name = sc.nextLine();
+        if (name.isEmpty()) {
+            throw new ServiceException("You must supply a name");
+        }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public JSONObject toJSON() {
+        JSONObject json = new JSONObject();
+        try {
+            json.put("service", "getnicknames");
+            json.put("name", name);
+        } catch (JSONException ignored) {}
+        return json;
+    }
+}
