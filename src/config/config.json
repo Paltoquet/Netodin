@@ -1,0 +1,39 @@
+{
+  "users": [
+    {
+      "name": "Bob",
+      "nicknames": [
+        "Boby",
+        "Gob"
+      ]
+    },
+    {
+      "name": "Jack",
+      "nicknames": [
+        "Jacky"
+      ]
+    },
+    {
+      "name": "Luke",
+      "nicknames": [
+        "Lucas",
+        "Lucky"
+      ]
+    },
+    {
+      "name": "James",
+      "nicknames": [
+        "Bond",
+        "OO7"
+      ]
+    },
+    {
+      "name": "Stuart",
+      "nicknames": [
+        "Little"
+      ]
+    }
+
+
+  ]
+}
