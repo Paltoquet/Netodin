@@ -3,7 +3,7 @@ package enums;
 import exceptions.ServiceException;
 
 public enum Services {
-    ADD, UPDATE, REMOVE, LIST, GETNICKNAMES, QUIT;
+    ADD, UPDATE, DELETE, LIST, GETNICKNAMES, QUIT;
 
     /**
      * Verify if a service exist
@@ -36,7 +36,7 @@ public enum Services {
                 return new client.services.AddUser();
             case UPDATE:
                 return new client.services.UpdateUser();
-            case REMOVE:
+            case DELETE:
                 return new client.services.RemoveUser();
             case LIST:
                 return new client.services.ListUsers();
@@ -65,7 +65,7 @@ public enum Services {
                 return new server.commands.AddUser();
             case UPDATE:
                 return new server.commands.UpdateUser();
-            case REMOVE:
+            case DELETE:
                 return new server.commands.RemoveUser();
             case LIST:
                 return new server.commands.ListUsers();

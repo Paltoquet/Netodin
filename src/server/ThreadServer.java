@@ -70,10 +70,12 @@ public class ThreadServer implements Runnable {
                 out.println(command.getError());
             }
 
-            if (json.getString("service").equalsIgnoreCase(String.valueOf(Services.QUIT))) {
-                closeSocket();
-                break;
-            }
+            try {
+                if (json.getString("service").equalsIgnoreCase(String.valueOf(Services.QUIT))) {
+                    closeSocket();
+                    break;
+                }
+            } catch (JSONException ignore) {}
         }
     }
 
