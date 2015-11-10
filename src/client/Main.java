@@ -2,7 +2,7 @@ package client;
 
 import exceptions.ConnectionException;
 
-public class MainClient {
+public class Main {
 
     public static void main(String [] args){
         try {
