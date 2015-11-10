@@ -7,6 +7,8 @@ import exceptions.ServiceException;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
@@ -47,26 +49,31 @@ public class Client {
         Scanner sc = new Scanner(System.in);
 
         while (sc.hasNext()) {
-            Service service;
+            String service = sc.nextLine();
+            Service command;
 
             try {
-                service = Services.getClientService(sc.nextLine());
-                service.initialize(sc);
+                command = Services.getClientService(service);
+                command.initialize(sc);
             } catch (ServiceException e) {
                 System.err.println("Error : " + e.getMessage());
                 System.err.flush();
-                System.out.flush();
                 System.out.print("Commande : ");
                 continue;
             }
 
-            System.out.println(service.toString());
-            writer.println(service.toString());
+            writer.println(command.toString());
 
             try {
                 System.out.println(reader.readLine());
             } catch (IOException e) {
                 System.err.println("Can't get the response from the server");
+                System.err.flush();
+            }
+
+            if (service.equalsIgnoreCase(String.valueOf(Services.QUIT))) {
+                System.out.println("Bye !");
+                break;
             }
 
             System.out.print("Commande : ");

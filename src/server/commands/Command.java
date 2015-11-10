@@ -1,6 +1,5 @@
-package server.modify;
+package server.commands;
 
-import exceptions.ServiceException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -14,19 +13,31 @@ public abstract class Command
      * Execute the command from a json object
      *
      * @param json the json to parse
-     * @throws ServiceException if the command is not valid
      */
     public abstract void execute(JSONObject json);
 
     /**
      * Set the result of the command
      * when the command was successful
+     * without additional data
      */
     protected void setResult() {
+        setResult(null);
+    }
+
+    /**
+     * Set the result of the command
+     * when the command was successful
+     * with additional data
+     */
+    protected void setResult(Object obj) {
         try {
             result = new JSONObject();
             result.put("response", "OK");
-        } catch (JSONException e) {}
+            if (obj != null) {
+                result.put("data", obj);
+            }
+        } catch (JSONException ignore) {}
     }
 
     /**
@@ -40,7 +51,7 @@ public abstract class Command
             error = new JSONObject();
             error.put("response", "NOK");
             error.put("reason", reason);
-        } catch (JSONException e) {}
+        } catch (JSONException ignore) {}
     }
 
     /**

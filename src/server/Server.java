@@ -25,15 +25,6 @@ public class Server {
      */
     public Server(int port, String configFile) throws ConnectionException {
         try {
-            System.out.println("Starting server...");
-            serverSocket = new ServerSocket(port);
-            System.out.println("Server started");
-            System.out.println();
-        } catch (IOException e) {
-            throw new ConnectionException("Can't create a server socket...");
-        }
-
-        try {
             System.out.println("Loading configuration");
             loadConfig(configFile);
             System.out.println("Configuration loaded");
@@ -41,8 +32,24 @@ public class Server {
         } catch (FileNotFoundException e) {
             throw new ConnectionException("Can't load config file : " + e.getMessage());
         }
+
+        try {
+            System.out.println("Starting server...");
+            serverSocket = new ServerSocket(port);
+            System.out.println("Server started");
+            System.out.println();
+        } catch (IOException e) {
+            throw new ConnectionException("Can't create a server socket...");
+        }
     }
 
+    /**
+     * Load a file, convert the file to a JSONObject
+     * and then give the json to initialize the server
+     *
+     * @param configFile the filename to load
+     * @throws FileNotFoundException if the file was not found
+     */
     private void loadConfig(String configFile) throws FileNotFoundException {
         File file = new File(configFile);
         FileInputStream fis = new FileInputStream(file);
@@ -50,7 +57,6 @@ public class Server {
         JSONObject json = new JSONObject(tokener);
 
         Configuration.load(json);
-
     }
 
     /**
@@ -64,7 +70,7 @@ public class Server {
         while (true) {
             try {
                 Socket client = serverSocket.accept();
-                System.out.println("new client : " + client);
+                System.out.println("[" + client.getRemoteSocketAddress() + "] Client connected");
 
                 new Thread(new ThreadServer(client)).start();
             } catch (IOException e) {

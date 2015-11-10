@@ -4,7 +4,7 @@ import enums.Services;
 import exceptions.ServiceException;
 import org.json.JSONException;
 import org.json.JSONObject;
-import server.modify.Command;
+import server.commands.Command;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -53,12 +53,10 @@ public class ThreadServer implements Runnable {
                 json = new JSONObject(in.readLine());
                 command = Services.getServerService(json.getString("service"));
             } catch (IOException e) {
-                System.err.println("Can't read from input stream.");
-                System.err.println(e.getMessage());
                 closeSocket();
-                return ;
+                break;
             } catch (JSONException e) {
-                sendError("Bad formatted JSON");
+                sendError("This service does not exist");
                 continue;
             } catch (ServiceException e) {
                 sendError(e.getMessage());
@@ -71,6 +69,11 @@ public class ThreadServer implements Runnable {
             } else {
                 out.println(command.getError());
             }
+
+            if (json.getString("service").equalsIgnoreCase(String.valueOf(Services.QUIT))) {
+                closeSocket();
+                break;
+            }
         }
     }
 
@@ -80,6 +83,7 @@ public class ThreadServer implements Runnable {
     private void closeSocket() {
         try {
             socket.close();
+            System.out.println("[" + socket.getRemoteSocketAddress() + "] Client disconnected");
         } catch (IOException e) {
             System.err.println("Can't close client socket.");
             System.err.println(e.getMessage());

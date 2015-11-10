@@ -5,16 +5,13 @@ import org.json.JSONObject;
 
 import java.util.Scanner;
 
-/**
- * Created by user on 10/11/2015.
- */
-public class Delete extends Service {
+public class RemoveUser extends Service {
 
+    /**
+     * The username
+     */
     String name;
 
-    public Delete(){
-
-    }
     @Override
     public void initialize(Scanner sc) throws ServiceException {
         System.out.print("Name : ");
@@ -26,8 +23,9 @@ public class Delete extends Service {
 
     @Override
     public JSONObject toJSON() {
-        JSONObject result=new JSONObject();
-        result.put("name",name);
+        JSONObject result = new JSONObject();
+        result.put("service", "delete");
+        result.put("name", name);
         return result;
     }
 }

@@ -7,7 +7,7 @@ public class Main {
 
     public static void main(String [] args){
         try {
-            Server server = new Server(1337, "D:\\Netodine\\src\\config\\config.json");
+            Server server = new Server(Integer.parseInt(args[0]), args[1]);
             server.run();
         } catch (ConnectionException e) {
             System.err.println(e.getMessage());

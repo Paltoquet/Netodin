@@ -3,6 +3,8 @@ package client.services;
 import exceptions.ServiceException;
 import org.json.JSONException;
 import org.json.JSONObject;
+import util.Nicknames;
+import util.User;
 
 
 import java.util.ArrayList;
@@ -13,48 +15,35 @@ import java.util.StringTokenizer;
 public class AddUser extends Service
 {
     /**
-     * The name of the new user
+     * The user
      */
-    private String name;
+    private User user;
 
     /**
-     * The aliases of the new user
-     */
-    private List<String> nicknames;
-
-    /**
-     * Initialize the list to
+     * Initialize the user to
      * avoid null pointer exception
      */
     public AddUser() {
-        nicknames = new ArrayList<>();
+        user = new User();
     }
 
     @Override
     public void initialize(Scanner sc) throws ServiceException {
         System.out.print("Name : ");
-        name = sc.nextLine();
-        if (name.isEmpty()) {
+        user.setName(sc.nextLine());
+        if (user.getName().isEmpty()) {
             throw new ServiceException("You must supply a name");
         }
 
         System.out.print("Nicknames (spaced by spaces) : ");
         StringTokenizer tokenizer = new StringTokenizer(sc.nextLine());
         while (tokenizer.hasMoreTokens()) {
-            nicknames.add(tokenizer.nextToken());
+            user.getNicknames().add(tokenizer.nextToken());
         }
 
-        if (nicknames.size() == 0) {
+        if (user.getNicknames().size() == 0) {
             throw new ServiceException("You must supply at least one nickname");
         }
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<String> getNicknames() {
-        return nicknames;
     }
 
     @Override
@@ -62,8 +51,8 @@ public class AddUser extends Service
         JSONObject json = new JSONObject();
         try {
             json.put("service", "add");
-            json.put("name", name);
-            json.put("nicknames", nicknames);
+            json.put("name", user.getName());
+            json.put("nicknames", user.getNicknames());
         } catch (JSONException ignored) {}
         return json;
     }

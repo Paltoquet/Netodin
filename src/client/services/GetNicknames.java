@@ -25,10 +25,6 @@ public class GetNicknames extends Service
         }
     }
 
-    public String getName() {
-        return name;
-    }
-
     @Override
     public JSONObject toJSON() {
         JSONObject json = new JSONObject();

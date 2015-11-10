@@ -1,10 +1,9 @@
 package enums;
 
 import exceptions.ServiceException;
-import server.modify.Command;
 
 public enum Services {
-    ADD, LIST, GETNICKNAMES , UPDATE , DELETE;
+    ADD, UPDATE, REMOVE, LIST, GETNICKNAMES, QUIT;
 
     /**
      * Verify if a service exist
@@ -35,14 +34,16 @@ public enum Services {
         switch (valueOf(service.toUpperCase())) {
             case ADD:
                 return new client.services.AddUser();
+            case UPDATE:
+                return new client.services.UpdateUser();
+            case REMOVE:
+                return new client.services.RemoveUser();
             case LIST:
                 return new client.services.ListUsers();
             case GETNICKNAMES:
                 return new client.services.GetNicknames();
-            case UPDATE:
-                return new client.services.Update();
-            case DELETE:
-                return new client.services.Delete();
+            case QUIT:
+                return new client.services.Quit();
             default:
                 throw new ServiceException("The requested service doesn't exist"); // only make the shitty compiler happy
         }
@@ -54,19 +55,26 @@ public enum Services {
      * @return an instance of the requested service
      * @throws ServiceException if the service does not exist
      */
-    public static Command getServerService(String service) throws ServiceException {
+    public static server.commands.Command getServerService(String service) throws ServiceException {
         if (!hasService(service)) {
             throw new ServiceException("The requested service doesn't exist");
         }
 
         switch (valueOf(service.toUpperCase())) {
             case ADD:
-                return new server.modify.AddUser();
+                return new server.commands.AddUser();
+            case UPDATE:
+                return new server.commands.UpdateUser();
+            case REMOVE:
+                return new server.commands.RemoveUser();
             case LIST:
-                return new server.modify.ListUsers();
-            // TODO getnicknames
+                return new server.commands.ListUsers();
+            case GETNICKNAMES:
+                return new server.commands.GetNicknames();
+            case QUIT:
+                return new server.commands.Quit();
             default:
-                throw new ServiceException("The requested service doesn't exist"); // only make the shitty compiler happy
+                throw new ServiceException("The requested service doesn't exist"); // only makes the shitty compiler happy
         }
     }
 }

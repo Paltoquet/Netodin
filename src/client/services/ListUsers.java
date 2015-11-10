@@ -5,6 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
@@ -19,7 +20,7 @@ public class ListUsers extends Service
      * Return only users starting
      * with one of the following strings
      */
-    private java.util.List<String> startWith;
+    private List<String> startWith;
 
     /**
      * Initialize the list to

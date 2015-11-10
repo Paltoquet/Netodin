@@ -1,80 +1,126 @@
 package server;
 
-import jdk.nashorn.internal.parser.JSONParser;
+import exceptions.ModifyException;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONTokener;
+import util.Nicknames;
+import util.User;
+import util.Users;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 public class Configuration {
     /**
      * Map containing users with their nicknames (aliases)
      *
-     * We use a TreeMap, brcause it is an implementation
+     * We use a TreeMap, because it is an implementation
      * of the SortedMap and in this way, we will have
      * the keys sorted alphabetically
      * (useful for the list service)
      */
-    private static Map<String, List<String>> users = new TreeMap<>();
+    private static Users users = new Users();
 
     /**
-     * Avoid the instanciation of the class
+     * Avoid the instantiation of the class
      */
-
-
     private Configuration() {}
 
     /**
+     * Load the configuration of the server
+     * a.k.a users with their nicknames
      *
-     * @param user the name of the user
-     * @param nicknames the aliases of the user
-     * @return true if the user was added, false otherwise
+     * @param json the json to format
      */
-    public static boolean addUser(String user, List<String> nicknames) {
-        if (users.containsKey(user)) {
-            return false;
-        }
-
-        users.put(user, nicknames);
-        return true;
-    }
-
-
     public static void load(JSONObject json){
-        JSONArray tab=json.getJSONArray("users");
-        for(int i=0;i<tab.length();i++){
-            String name=tab.getJSONObject(i).getString("name");
-            ArrayList<String> nicknames= new ArrayList<>();
+        JSONArray users = json.getJSONArray("users");
+        for (int i = 0; i < users.length(); ++i) {
+            User user = new User();
+            user.setName(users.getJSONObject(i).getString("name"));
 
             //iterate through nicknames
-            for(int c=0;c<tab.getJSONObject(i).getJSONArray("nicknames").length();c++){
-                 nicknames.add(tab.getJSONObject(i).getJSONArray("nicknames").getString(c));
+            JSONArray nicknames = users.getJSONObject(i).getJSONArray("nicknames");
+            for (int j = 0; j < nicknames.length(); ++j){
+                user.getNicknames().add(nicknames.getString(j));
             }
-            addUser(name, nicknames);
+
+            try {
+                add(user);
+            } catch (ModifyException e) {
+                System.err.println("Cannot load user : " + user.getName() + "(" + e.getMessage() + ")");
+            }
         }
     }
+
+    /**
+     *
+     * @param user the instance object of the user
+     * @throws ModifyException if the user is already present
+     */
+    public static void add(User user) throws ModifyException {
+        if (users.containsKey(user.getName())) {
+            throw new ModifyException("User already present");
+        }
+
+        verifyNicknames(user.getNicknames());
+        users.put(user.getName(), user.getNicknames());
+    }
+
+    /**
+     *
+     * @param name the current username
+     * @param user the instance object of the user
+     * @throws ModifyException if the conditions are not respected
+     */
+    public static void update(String name, User user) throws ModifyException {
+        if (!users.containsKey(name)) {
+            throw new ModifyException("The user " + name + " does not exist");
+        }
+
+        if (user.getName().isEmpty() && user.getNicknames().size() == 0) {
+            throw new ModifyException("You have to specify at least a new username or some new nicknames");
+        }
+
+        if (user.getNicknames().size() == 0) {
+            user.setNicknames(users.get(name));
+        }
+
+        verifyNicknames(user.getNicknames());
+        delete(name);
+        add(user);
+    }
+
+    /**
+     *
+     * @param name the user to remove
+     * @throws ModifyException if the user does not exist
+     */
+    public static void delete(String name) throws ModifyException {
+        if (!users.containsKey(name)) {
+            throw new ModifyException("The user " + name + " does not exist");
+        }
+
+        users.remove(name);
+    }
+
     /**
      *
      * @param limit the maximum number of user to return
      * @param startWith starting pattern for the users
      * @return the list of matching users
      */
-    public static Map<String, List<String>> listUsers(int limit, List<String> startWith) {
-        Map<String, List<String>> matchingUsers = new TreeMap<>();
+    public static Users listUsers(int limit, List<String> startWith) {
+       Users matchingUsers = new Users();
 
-        for (Map.Entry<String, List<String>> user : users.entrySet()) {
-            for (String value : startWith) {
-                if (user.getKey().startsWith(value) && !matchingUsers.containsKey(user.getKey())) {
-                    matchingUsers.put(user.getKey(), user.getValue());
-                    break;
+        for (Map.Entry<String, Nicknames> user : users.entrySet()) {
+            if (startWith.size() == 0) {
+                matchingUsers.put(user.getKey(), user.getValue());
+            } else {
+                for (String value : startWith) {
+                    if (user.getKey().toLowerCase().startsWith(value.toLowerCase()) && !matchingUsers.containsKey(user.getKey())) {
+                        matchingUsers.put(user.getKey(), user.getValue());
+                        break;
+                    }
                 }
             }
 
@@ -84,5 +130,34 @@ public class Configuration {
         }
 
         return matchingUsers;
+    }
+
+    /**
+     * Get the nicknames of one user
+     *
+     * @param name the user we want the nicknames
+     * @return the nicknames
+     * @throws ModifyException if the user does not exist
+     */
+    public static Nicknames getNicknames(String name) throws ModifyException {
+        if (!users.containsKey(name)) {
+            throw new ModifyException("The user " + name + " does not exist");
+        }
+
+        return users.get(name);
+    }
+
+    /**
+     * Verify if the asked nicknames are available
+     *
+     * @param nicknames the nicknames to check
+     * @throws ModifyException if one nickname is not available
+     */
+    private static void verifyNicknames(Nicknames nicknames) throws ModifyException {
+        for(String nickname : nicknames) {
+            if (!users.isNicknameAvailable(nickname)) {
+                throw new ModifyException("The nickname " + nickname + " is already taken");
+            }
+        }
     }
 }
