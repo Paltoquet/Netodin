@@ -4,7 +4,7 @@ import exceptions.ServiceException;
 import server.modify.Command;
 
 public enum Services {
-    ADD, LIST, GETNICKNAMES /*, UPDATE, DELETE*/;
+    ADD, LIST, GETNICKNAMES , UPDATE /*, DELETE*/;
 
     /**
      * Verify if a service exist
@@ -39,6 +39,8 @@ public enum Services {
                 return new client.services.ListUsers();
             case GETNICKNAMES:
                 return new client.services.GetNicknames();
+            case UPDATE:
+                return new client.services.Update();
             default:
                 throw new ServiceException("The requested service doesn't exist"); // only make the shitty compiler happy
         }
