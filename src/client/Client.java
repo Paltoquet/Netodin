@@ -60,7 +60,6 @@ public class Client
                 continue;
             }
 
-            System.out.println(command.toString());
             writer.println(command.toString());
 
             try {

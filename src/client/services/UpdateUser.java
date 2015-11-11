@@ -52,13 +52,12 @@ public class UpdateUser extends Service
 
     @Override
     public void parseResult(JSONObject json) throws JSONException {
-        String result=json.getString("response");
-        if(result.equals("NOK")){
-            System.out.println("Error: "+ json.getString("reason"));
+        if (!json.getString("response").equals("OK")) {
+            System.err.println("Error: " + json.getString("reason"));
+            System.err.flush();
+            return ;
         }
-        else{
-            System.out.println(name+" updated");
-        }
+        System.out.println(name + " updated");
     }
 
     @Override

@@ -46,14 +46,13 @@ public class AddUser extends Service
 
     @Override
     public void parseResult(JSONObject json) throws JSONException {
-        String result=json.getString("response");
-        if(result.equals("NOK")){
-            System.out.println("Error: "+ json.getString("reason"));
-        }
-        else{
-            System.out.println(user.getName()+" added with success");
+        if(!json.getString("response").equals("OK")){
+            System.err.println("Error: " + json.getString("reason"));
+            System.err.flush();
+            return ;
         }
 
+        System.out.println(user.getName()+" added with success");
     }
 
     @Override

@@ -24,19 +24,18 @@ public class GetNicknames extends Service
 
     @Override
     public void parseResult(JSONObject json) throws JSONException {
-        String result=json.getString("response");
-        if(result.equals("NOK")){
-            System.out.println("Error: "+ json.getString("reason"));
-        }
-        else{
-            System.out.println("nicknames of " + name + ":");
-            JSONArray nicknames=json.getJSONArray("data");
-            for(int i=0;i<nicknames.length();i++){
-                System.out.println(nicknames.getString(i));
-            }
+        if (!json.getString("response").equals("OK")){
+            System.err.println("Error: " + json.getString("reason"));
+            System.err.flush();
+            return ;
         }
 
-
+        System.out.print("Nicknames of " + name + " : ");
+        JSONArray nicknames = json.getJSONArray("data");
+        for(int i = 0; i < nicknames.length(); ++i){
+            System.out.print(nicknames.getString(i));
+        }
+        System.out.println();
     }
 
     @Override
