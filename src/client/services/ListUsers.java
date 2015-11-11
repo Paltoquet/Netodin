@@ -1,6 +1,7 @@
 package client.services;
 
 import exceptions.ServiceException;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -49,7 +50,24 @@ public class ListUsers extends Service
 
     @Override
     public void parseResult(JSONObject json) throws JSONException {
-
+        String result=json.getString("response");
+        if(result.equals("NOK")){
+            System.out.println("Error: "+ json.getString("reason"));
+        }
+        else{
+            JSONObject data=json.getJSONObject("data");
+            //les différentes names
+            for(int i=0;i<data.names().length();i++){
+                String nom=data.names().getString(i);
+                System.out.println("Name : " + nom);
+                JSONArray tab=data.getJSONArray(nom);
+                //leurs surnoms
+                for(int c=0;c<tab.length();c++){
+                    System.out.println(tab.getString(c));
+                }
+                System.out.print("\n");
+            }
+        }
     }
 
     @Override

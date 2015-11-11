@@ -1,5 +1,7 @@
 package client.services;
 
+import com.sun.org.apache.xpath.internal.SourceTree;
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import exceptions.ServiceException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,6 +46,13 @@ public class AddUser extends Service
 
     @Override
     public void parseResult(JSONObject json) throws JSONException {
+        String result=json.getString("response");
+        if(result.equals("NOK")){
+            System.out.println("Error: "+ json.getString("reason"));
+        }
+        else{
+            System.out.println(user.getName()+" added with success");
+        }
 
     }
 

@@ -4,6 +4,7 @@ import enums.Services;
 import exceptions.ConnectionException;
 import client.services.Service;
 import exceptions.ServiceException;
+import org.json.JSONObject;
 
 import java.io.*;
 import java.net.Socket;
@@ -63,7 +64,7 @@ public class Client
             writer.println(command.toString());
 
             try {
-                System.out.println(reader.readLine());
+                command.parseResult(new JSONObject(reader.readLine()));
             } catch (IOException e) {
                 System.err.println("Can't get the response from the server");
                 System.err.flush();

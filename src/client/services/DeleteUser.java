@@ -24,6 +24,14 @@ public class DeleteUser extends Service
 
     @Override
     public void parseResult(JSONObject json) throws JSONException {
+        String result=json.getString("response");
+        if(result.equals("NOK")){
+            System.out.println("Erreur: "+ json.getString("reason"));
+        }
+        else{
+            System.out.println(name+" deleted");
+        }
+
 
     }
 

@@ -12,7 +12,15 @@ public class Quit extends Service
     public void initialize(Scanner sc) throws ServiceException {}
 
     @Override
-    public void parseResult(JSONObject json) throws JSONException {}
+    public void parseResult(JSONObject json) throws JSONException {
+        String result=json.getString("response");
+        if(result.equals("NOK")){
+            System.out.println("Error: "+ json.getString("reason"));
+        }
+        else{
+            System.out.println("disconnected");
+        }
+    }
 
     @Override
     public JSONObject toJSON() {
