@@ -4,6 +4,7 @@ import enums.Services;
 import exceptions.ConnectionException;
 import client.services.Service;
 import exceptions.ServiceException;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -61,9 +62,12 @@ public class Client
             }
 
             writer.println(command.toString());
-
+            
             try {
                 command.parseResult(new JSONObject(reader.readLine()));
+            } catch(JSONException e) {
+                System.err.println("Bad formatted json");
+                System.err.flush();
             } catch (IOException e) {
                 System.err.println("Can't get the response from the server");
                 System.err.flush();
