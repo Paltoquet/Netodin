@@ -22,6 +22,11 @@ public class GetNicknames extends Service
     }
 
     @Override
+    public void parseResult(JSONObject json) throws JSONException {
+
+    }
+
+    @Override
     public JSONObject toJSON() {
         JSONObject json = new JSONObject();
         try {

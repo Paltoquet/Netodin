@@ -12,6 +12,9 @@ public class Quit extends Service
     public void initialize(Scanner sc) throws ServiceException {}
 
     @Override
+    public void parseResult(JSONObject json) throws JSONException {}
+
+    @Override
     public JSONObject toJSON() {
         JSONObject json = new JSONObject();
         try {

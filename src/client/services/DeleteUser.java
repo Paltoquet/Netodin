@@ -1,6 +1,7 @@
 package client.services;
 
 import exceptions.ServiceException;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Scanner;
@@ -19,6 +20,11 @@ public class DeleteUser extends Service
         if (name.isEmpty()) {
             throw new ServiceException("You must supply a name");
         }
+    }
+
+    @Override
+    public void parseResult(JSONObject json) throws JSONException {
+
     }
 
     @Override

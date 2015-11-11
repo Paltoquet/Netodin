@@ -1,6 +1,7 @@
 package client.services;
 
 import exceptions.ServiceException;
+import org.json.JSONException;
 import org.json.JSONObject;
 import util.User;
 
@@ -47,6 +48,11 @@ public class UpdateUser extends Service
         if (newUser.getName().isEmpty() && newUser.getNicknames().size() == 0) {
             throw new ServiceException("You must supply a new name or new nicknames, otherwise it will do nothing");
         }
+    }
+
+    @Override
+    public void parseResult(JSONObject json) throws JSONException {
+
     }
 
     @Override
