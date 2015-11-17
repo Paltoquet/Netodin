@@ -86,8 +86,8 @@ public class Configuration
             user.setNicknames(users.get(name));
         }
 
-        verifyNicknames(user.getNicknames());
         delete(name);
+        verifyNicknames(user.getNicknames());
         add(user);
     }
 
