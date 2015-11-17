@@ -13,12 +13,8 @@ import java.util.Map;
 public class Configuration
 {
     /**
-     * Map containing users with their nicknames (aliases)
-     *
-     * We use a TreeMap, because it is an implementation
-     * of the SortedMap and in this way, we will have
-     * the keys sorted alphabetically
-     * (useful for the list service)
+     * The list of users
+     * Users extends TreeMap<String, Nicknames>
      */
     private static Users users = new Users();
 
