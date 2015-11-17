@@ -62,7 +62,7 @@ public class Client
             }
 
             writer.println(command.toString());
-            
+
             try {
                 command.parseResult(new JSONObject(reader.readLine()));
             } catch(JSONException e) {

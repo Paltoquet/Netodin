@@ -62,7 +62,13 @@ public class ThreadServer implements Runnable
             JSONObject json;
             Command command;
             try {
-                json = new JSONObject(in.readLine());
+                String data = in.readLine();
+                if (data == null) {
+                    closeSocket();
+                    break;
+                }
+
+                json = new JSONObject(data);
                 command = Services.getServerService(json.getString("service"));
             } catch (IOException e) {
                 closeSocket();
@@ -111,7 +117,7 @@ public class ThreadServer implements Runnable
         try {
             JSONObject json = new JSONObject();
             json.put("result", "NOK");
-            json.put("result", reason);
+            json.put("reason", reason);
 
             out.println(json.toString());
         } catch (JSONException ignored) {}
