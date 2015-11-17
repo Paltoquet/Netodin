@@ -87,7 +87,6 @@ public class Configuration
         }
 
         delete(name);
-        verifyNicknames(user.getNicknames());
         add(user);
     }
 
