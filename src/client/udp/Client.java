@@ -7,23 +7,33 @@ import exceptions.ServiceException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.*;
 import java.util.Scanner;
 
 
 public class Client
 {
-
-    private boolean finReception=false;
-    private int _port;
-    private InetAddress adresse;
-    public static int size=256;
+    /**
+     * The UDP socket
+     */
     private DatagramSocket client;
-    private byte[] buffer;
+
+    /**
+     * The server's address
+     */
+    private InetAddress address;
+
+    /**
+     * The server's port
+     */
+    private int port;
+
+    /**
+     * the buffer's size
+     */
+    private final static int bufLen = 256;
+
     /**
      *
      * @param host the machine to contact
@@ -32,13 +42,11 @@ public class Client
      */
     public Client(String host, int port) throws ConnectionException {
         try {
-            InetAddress adresse = InetAddress.getByName(host);
+            address = InetAddress.getByName(host);
+            this.port = port;
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            throw new ConnectionException(e.getMessage());
         }
-        buffer=new byte[256];
-        _port=port;
-
     }
 
     /**
@@ -50,7 +58,7 @@ public class Client
 
         while (sc.hasNext()) {
             try {
-                client=new DatagramSocket();
+                client = new DatagramSocket();
             } catch (SocketException e) {
                 System.err.println("can't create Socket");
             }
@@ -73,64 +81,54 @@ public class Client
             }
 
             DatagramPacket packet;
-            String envoie=command.toString() + "\n";
+            String toSend = command.toString() + "\n";
 
-            for (int i = 0; i < envoie.length(); i += 256) {
-                byte[] buffer = envoie.substring(i, (i+255 < envoie.length() ? i+255 : envoie.length() - 1)).getBytes();
-                packet=new DatagramPacket(buffer,buffer.length,adresse,_port);
-                packet.setData(buffer);
+            for (int i = 0; i < toSend.length(); i += bufLen) {
+                byte[] buffer = toSend.substring(i, (i + bufLen < toSend.length() ? i + bufLen : toSend.length())).getBytes();
+                packet = new DatagramPacket(buffer, buffer.length, address, port);
+
                 try {
                     client.send(packet);
                 } catch (IOException e) {
-                    e.printStackTrace();
-                    continue;
+                    System.err.println("Unable to send all command packets... Command aborted");
                 }
             }
 
-//            int i=0;
-//            while(i<buff.length) {
-//                for (int j = 0; j < 255 || i==buff.length; i++, j++) {
-//                    buffer[j] = buff[i];
-//                }
-//                packet.setData(buffer);
-//                try {
-//                    client.send(packet);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-            //writer.println(command.toString());
-
-            String reponse=buildReponse();
-
             try {
-                command.parseResult(new JSONObject(reponse.substring(0,reponse.length()-2)));
+                command.parseResult(new JSONObject(getResponse()));
             } catch(JSONException e) {
                 System.err.println("Bad formatted json");
                 System.err.flush();
             }
 
             System.out.print("Commande : ");
-            finReception=false;
             client.close();
         }
     }
 
-    public String buildReponse(){
-        String reponse="";
-        DatagramPacket recu=new DatagramPacket(buffer,size,adresse,_port);
-        while(!finReception) {
+    /**
+     * Get the response from the server
+     *
+     * @return a string which contains the response from the server
+     */
+    public String getResponse(){
+        String ret = "";
+
+        while (true) {
+            byte[] buf = new byte[bufLen];
+            DatagramPacket packet = new DatagramPacket(buf, buf.length);
+
             try {
-                client.receive(recu);
-                String tmp = new String(recu.getData());
-                reponse+=tmp;
-                if(tmp.charAt(tmp.length()-1)=='\n'){
-                    finReception=true;
-                }
+                client.receive(packet);
             } catch (IOException e) {
-                System.out.println("erreur reception packet");
+                System.err.println("Unable to receive one of the server's packets");
+                return "";
+            }
+            ret += new String(packet.getData(), 0, packet.getLength());
+
+            if (ret.charAt(ret.length() - 1) == '\n') {
+                return ret.substring(0, ret.length() - 1);
             }
         }
-        return reponse;
     }
 }
