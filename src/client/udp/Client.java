@@ -11,22 +11,19 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.Socket;
+import java.net.*;
 import java.util.Scanner;
 
 
 public class Client
 {
-    /**
-     * Writing to the server
-     */
-    private PrintWriter writer;
 
-    /**
-     * Reader from the server
-     */
-    private BufferedReader reader;
-
+    private boolean finReception=false;
+    private int _port;
+    private InetAddress adresse;
+    public static int size=256;
+    private DatagramSocket client;
+    private byte[] buffer;
     /**
      *
      * @param host the machine to contact
@@ -35,12 +32,13 @@ public class Client
      */
     public Client(String host, int port) throws ConnectionException {
         try {
-            Socket connection = new Socket(host, port);
-            writer = new PrintWriter(connection.getOutputStream(), true);
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        } catch (IOException e) {
-           throw new ConnectionException("Unable to establish the connection");
+            InetAddress adresse = InetAddress.getByName(host);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
         }
+        buffer=new byte[256];
+        _port=port;
+
     }
 
     /**
@@ -51,6 +49,11 @@ public class Client
         Scanner sc = new Scanner(System.in);
 
         while (sc.hasNext()) {
+            try {
+                client=new DatagramSocket();
+            } catch (SocketException e) {
+                System.err.println("can't create Socket");
+            }
             String service = sc.nextLine();
             Service command;
 
@@ -64,26 +67,70 @@ public class Client
                 continue;
             }
 
-            writer.println(command.toString());
-
-            try {
-                command.parseResult(new JSONObject(reader.readLine()));
-            } catch(JSONException e) {
-                System.err.println("Bad formatted json");
-                System.err.flush();
-            } catch (IOException e) {
-                System.err.println("Can't get the response from the server");
-                System.err.flush();
-            }
-
             if (service.equalsIgnoreCase(String.valueOf(Services.QUIT))) {
                 System.out.println("Bye !");
                 break;
             }
 
-            System.out.print("Commande : ");
-        }
+            DatagramPacket packet;
+            String envoie=command.toString() + "\n";
 
-        writer.close();
+            for (int i = 0; i < envoie.length(); i += 256) {
+                byte[] buffer = envoie.substring(i, (i+255 < envoie.length() ? i+255 : envoie.length() - 1)).getBytes();
+                packet=new DatagramPacket(buffer,buffer.length,adresse,_port);
+                packet.setData(buffer);
+                try {
+                    client.send(packet);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    continue;
+                }
+            }
+
+//            int i=0;
+//            while(i<buff.length) {
+//                for (int j = 0; j < 255 || i==buff.length; i++, j++) {
+//                    buffer[j] = buff[i];
+//                }
+//                packet.setData(buffer);
+//                try {
+//                    client.send(packet);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+            //writer.println(command.toString());
+
+            String reponse=buildReponse();
+
+            try {
+                command.parseResult(new JSONObject(reponse.substring(0,reponse.length()-2)));
+            } catch(JSONException e) {
+                System.err.println("Bad formatted json");
+                System.err.flush();
+            }
+
+            System.out.print("Commande : ");
+            finReception=false;
+            client.close();
+        }
+    }
+
+    public String buildReponse(){
+        String reponse="";
+        DatagramPacket recu=new DatagramPacket(buffer,size,adresse,_port);
+        while(!finReception) {
+            try {
+                client.receive(recu);
+                String tmp = new String(recu.getData());
+                reponse+=tmp;
+                if(tmp.charAt(tmp.length()-1)=='\n'){
+                    finReception=true;
+                }
+            } catch (IOException e) {
+                System.out.println("erreur reception packet");
+            }
+        }
+        return reponse;
     }
 }
