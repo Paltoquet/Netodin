@@ -1,4 +1,4 @@
-package server;
+package server.tcp;
 
 import enums.Services;
 import exceptions.ServiceException;

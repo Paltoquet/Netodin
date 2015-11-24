@@ -1,7 +1,6 @@
-package server;
+package server.tcp;
 
 import exceptions.ConnectionException;
-import server.Server;
 
 public class Main
 {

@@ -1,13 +1,16 @@
-package server;
+package server.udp;
 
 import exceptions.ConnectionException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import server.Configuration;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -16,7 +19,7 @@ public class Server
     /**
      * The socket of the server
      */
-    ServerSocket serverSocket;
+    DatagramSocket serverSocket;
 
     /**
      *
@@ -36,7 +39,7 @@ public class Server
 
         try {
             System.out.println("Starting server...");
-            serverSocket = new ServerSocket(port);
+            serverSocket = new DatagramSocket(port);
             System.out.println("Server started");
             System.out.println();
         } catch (IOException e) {
@@ -70,7 +73,11 @@ public class Server
 
         while (true) {
             try {
-                Socket client = serverSocket.accept();
+                byte[] buf = new byte[256];
+                DatagramPacket packet = new DatagramPacket(buf, buf.length);
+                serverSocket.receive(packet);
+
+                while (packet.getLength())
                 System.out.println("[" + client.getRemoteSocketAddress() + "] Client connected");
 
                 new Thread(new ThreadServer(client)).start();
