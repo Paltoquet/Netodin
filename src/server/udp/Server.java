@@ -1,26 +1,20 @@
 package server.udp;
 
-import enums.Services;
+import communication.Communication;
+import exceptions.CommunicationException;
 import exceptions.ConnectionException;
-import exceptions.ServiceException;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
+import server.AbstractServer;
 import server.Configuration;
-import server.commands.Command;
-import server.tcp.ThreadServer;
-import util.PacketDetails;
+import communication.PacketDetails;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.*;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Server
+public class Server extends AbstractServer
 {
     /**
      * The socket of the server
@@ -28,9 +22,16 @@ public class Server
     private DatagramSocket serverSocket;
 
     /**
-     * the buffer's size
+     * The datagram used to send data
      */
-    private final static int bufLen = 256;
+    private DatagramPacket datagram;
+
+    /**
+     * A map containing the incomplete requests
+     * of users (in case of the request doesn't
+     * fit in one chunk
+     */
+    private Map<InetAddress, PacketDetails> data;
 
     /**
      *
@@ -40,129 +41,68 @@ public class Server
      */
     public Server(int port, String configFile) throws ConnectionException {
         try {
-            System.out.println("Loading configuration");
-            loadConfig(configFile);
-            System.out.println("Configuration loaded");
-            System.out.println();
-        } catch (FileNotFoundException e) {
-            throw new ConnectionException("Can't load config file : " + e.getMessage());
-        }
+            Configuration.load(configFile);
 
-        try {
             System.out.println("Starting server...");
             serverSocket = new DatagramSocket(port);
             System.out.println("Server started");
             System.out.println();
+
+            byte[] buf = new byte[Communication.BUFLEN];
+            datagram = new DatagramPacket(buf, buf.length);
+
+            data = new HashMap<>();
         } catch (IOException e) {
             throw new ConnectionException("Can't create a server socket...");
         }
     }
 
     /**
-     * Load a file, convert the file to a JSONObject
-     * and then give the json to initialize the server
-     *
-     * @param configFile the filename to load
-     * @throws FileNotFoundException if the file was not found
-     */
-    private void loadConfig(String configFile) throws FileNotFoundException {
-        File file = new File(configFile);
-        FileInputStream fis = new FileInputStream(file);
-        JSONTokener tokener = new JSONTokener(fis);
-        JSONObject json = new JSONObject(tokener);
-
-        Configuration.load(json);
-    }
-
-    /**
      * Start waiting for incoming connection
-     * and start a new thread to interact with
-     * the client
+     * and start a new thread which removes
+     * outdated packages
      */
     public void run() {
         System.out.println("Waiting for incoming connection");
 
-        Map<InetAddress, PacketDetails> data = new HashMap<>();
         new Thread(new Watcher(data)).start();
-
         while (true) {
-            byte[] buf = new byte[bufLen];
-            DatagramPacket datagramPacket = new DatagramPacket(buf, buf.length);
-
             try {
-                serverSocket.receive(datagramPacket);
-            } catch (IOException e) {
-                continue;
-            }
-
-            PacketDetails packet;
-            if (!data.containsKey(datagramPacket.getAddress())) {
-                packet = new PacketDetails();
-            } else {
-                packet = data.get(datagramPacket.getAddress());
-            }
-            packet.updateMessage(new String(datagramPacket.getData(), 0, datagramPacket.getLength()));
-
-            if (packet.isComplete()) {
-                System.out.println(packet.getMessage());
-                System.out.println(executeCommand(packet.getMessage()).toString());
-                send(datagramPacket.getAddress(), datagramPacket.getPort(), executeCommand(packet.getMessage()).toString());
-                data.remove(datagramPacket.getAddress());
-            } else {
-                data.put(datagramPacket.getAddress(), packet);
-            }
+                String received = receive();
+                if (!received.isEmpty()) {
+                    data.remove(datagram.getAddress());
+                    send(executeCommand(new JSONObject(received)).toString());
+                }
+            } catch (JSONException e) {
+                try {
+                    send(getJSONError("Bad formatted JSON").toString());
+                } catch (CommunicationException ignore) {}
+            } catch (CommunicationException ignore) {}
         }
     }
 
-    private JSONObject executeCommand(String data) {
-        JSONObject json;
-        Command command;
-
+    @Override
+    protected String receive() throws CommunicationException {
         try {
-            json = new JSONObject(data);
-            command = Services.getServerService(json.getString("service"));
-        } catch (JSONException e) {
-            return getJSONError("This service does not exist");
-        } catch (ServiceException e) {
-            return getJSONError(e.getMessage());
+            serverSocket.receive(datagram);
+        } catch (IOException e) {
+            throw new CommunicationException("Can't receive datagram");
         }
 
-        command.execute(json);
-        if (command.isSuccess()) {
-            return command.getResult();
+        PacketDetails packet;
+        if (!data.containsKey(datagram.getAddress())) {
+            packet = new PacketDetails();
+        } else {
+            packet = data.get(datagram.getAddress());
         }
-        return command.getError();
+        packet.updateMessage(new String(datagram.getData(), 0, datagram.getLength()));
+        data.put(datagram.getAddress(), packet);
+
+        return packet.isComplete() ? packet.getMessage() : "";
     }
 
-    /**
-     * Create a json error to
-     * send to the client
-     *
-     * @param reason the reason of the error
-     */
-    private JSONObject getJSONError(String reason) {
-        try {
-            JSONObject json = new JSONObject();
-            json.put("result", "NOK");
-            json.put("reason", reason);
-
-            return json;
-        } catch (JSONException ignored) {
-            return new JSONObject();
-        }
-    }
-
-    private void send(InetAddress address, int port, String message) {
-        message += "\n";
-        for (int i = 0; i < message.length(); i += bufLen) {
-            byte[] buf = message.substring(i, (i + bufLen < message.length() ? i + bufLen : message.length())).getBytes();
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, port);
-
-            try {
-                serverSocket.send(packet);
-            } catch (IOException e) {
-                System.err.println("Unable to send all command packets... Command aborted");
-            }
-        }
+    @Override
+    protected void send(String message) throws CommunicationException {
+        Communication.sendUDP(serverSocket, datagram.getAddress(), datagram.getPort(), message);
     }
 }

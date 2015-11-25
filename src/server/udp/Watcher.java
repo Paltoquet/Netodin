@@ -1,6 +1,6 @@
 package server.udp;
 
-import util.PacketDetails;
+import communication.PacketDetails;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Map;

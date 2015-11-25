@@ -1,10 +1,10 @@
 package server.tcp;
 
 import enums.Services;
-import exceptions.ServiceException;
-import org.json.JSONException;
+import exceptions.CommunicationException;
+import exceptions.Disconnect;
 import org.json.JSONObject;
-import server.commands.Command;
+import server.AbstractServer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,7 +13,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
 
-public class ThreadServer implements Runnable
+public class ThreadServer extends AbstractServer implements Runnable
 {
     /**
      * The socket of the client
@@ -35,12 +35,20 @@ public class ThreadServer implements Runnable
      * @param socket the socket of the client
      * @throws SocketException if the socket is null
      */
-    ThreadServer(Socket socket) throws SocketException {
+    public ThreadServer(Socket socket) throws SocketException {
         if (socket == null) {
             throw new SocketException("The socket is null.");
         }
 
         this.socket = socket;
+
+        try {
+            this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            this.out = new PrintWriter(this.socket.getOutputStream(), true);
+        } catch (IOException e) {
+            closeSocket();
+            throw new SocketException("Can't instantiate input/output streams.");
+        }
     }
 
     /**
@@ -50,49 +58,35 @@ public class ThreadServer implements Runnable
     public void run() {
         while (true) {
             try {
-                out = new PrintWriter(socket.getOutputStream(), true);
-                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            } catch (IOException e) {
-                System.err.println("can't instantiate input/output streams.");
-                System.err.println(e.getMessage());
-                closeSocket();
-                return ;
-            }
+                JSONObject json = new JSONObject(receive());
+                send(executeCommand(json).toString());
 
-            JSONObject json;
-            Command command;
-            try {
-                String data = in.readLine();
-                if (data == null) {
-                    closeSocket();
-                    break;
+                if (json.has("service") && json.getString("service").equalsIgnoreCase(String.valueOf(Services.QUIT))) {
+                    throw new Disconnect();
                 }
-
-                json = new JSONObject(data);
-                command = Services.getServerService(json.getString("service"));
-            } catch (IOException e) {
-                closeSocket();
-                break;
-            } catch (JSONException e) {
-                sendError("This service does not exist");
-                continue;
-            } catch (ServiceException e) {
-                sendError(e.getMessage());
-                continue;
-            }
-
-            command.execute(json);
-            if (command.isSuccess()) {
-                out.println(command.getResult());
-            } else {
-                out.println(command.getError());
-            }
-
-            if (json.getString("service").equalsIgnoreCase(String.valueOf(Services.QUIT))) {
+            } catch (CommunicationException | Disconnect ignore) {
                 closeSocket();
                 break;
             }
         }
+    }
+
+    @Override
+    public String receive() throws CommunicationException {
+        try {
+            String data = in.readLine();
+            if (data == null) {
+                throw new CommunicationException("Can't read from input stream.");
+            }
+            return data;
+        } catch (IOException e) {
+            throw new CommunicationException("Can't read from input stream.");
+        }
+    }
+
+    @Override
+    public void send(String message) throws CommunicationException {
+        out.println(message);
     }
 
     /**
@@ -106,20 +100,5 @@ public class ThreadServer implements Runnable
             System.err.println("Can't close client socket.");
             System.err.println(e.getMessage());
         }
-    }
-
-    /**
-     * Send a json error to the client
-     *
-     * @param reason the reason of the error
-     */
-    private void sendError(String reason) {
-        try {
-            JSONObject json = new JSONObject();
-            json.put("result", "NOK");
-            json.put("reason", reason);
-
-            out.println(json.toString());
-        } catch (JSONException ignored) {}
     }
 }

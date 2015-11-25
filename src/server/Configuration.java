@@ -3,10 +3,14 @@ package server;
 import exceptions.ModifyException;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 import util.Nicknames;
 import util.User;
 import util.Users;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
 
@@ -25,11 +29,36 @@ public class Configuration
 
     /**
      * Load the configuration of the server
+     * a.k.a users with their nicknames with
+     * a filename
+     *
+     * @param fileName the path to the file to load
+     */
+    public static void load(String fileName) {
+        try {
+            System.out.println("Loading configuration");
+
+            File file = new File(fileName);
+            FileInputStream fis = new FileInputStream(file);
+            JSONTokener tokener = new JSONTokener(fis);
+            JSONObject json = new JSONObject(tokener);
+
+            Configuration.load(json);
+
+            System.out.println("Configuration loaded");
+            System.out.println();
+        } catch (FileNotFoundException e) {
+            System.err.println("Can't load config file : " + e.getMessage());
+        }
+    }
+
+    /**
+     * Load the configuration of the server
      * a.k.a users with their nicknames
      *
      * @param json the json to format
      */
-    public static void load(JSONObject json){
+    public static void load(JSONObject json) {
         JSONArray users = json.getJSONArray("users");
         for (int i = 0; i < users.length(); ++i) {
             User user = new User();

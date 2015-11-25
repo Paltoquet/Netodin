@@ -1,13 +1,8 @@
 package server.tcp;
 
 import exceptions.ConnectionException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 import server.Configuration;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -27,15 +22,8 @@ public class Server
      */
     public Server(int port, String configFile) throws ConnectionException {
         try {
-            System.out.println("Loading configuration");
-            loadConfig(configFile);
-            System.out.println("Configuration loaded");
-            System.out.println();
-        } catch (FileNotFoundException e) {
-            throw new ConnectionException("Can't load config file : " + e.getMessage());
-        }
+            Configuration.load(configFile);
 
-        try {
             System.out.println("Starting server...");
             serverSocket = new ServerSocket(port);
             System.out.println("Server started");
@@ -43,22 +31,6 @@ public class Server
         } catch (IOException e) {
             throw new ConnectionException("Can't create a server socket...");
         }
-    }
-
-    /**
-     * Load a file, convert the file to a JSONObject
-     * and then give the json to initialize the server
-     *
-     * @param configFile the filename to load
-     * @throws FileNotFoundException if the file was not found
-     */
-    private void loadConfig(String configFile) throws FileNotFoundException {
-        File file = new File(configFile);
-        FileInputStream fis = new FileInputStream(file);
-        JSONTokener tokener = new JSONTokener(fis);
-        JSONObject json = new JSONObject(tokener);
-
-        Configuration.load(json);
     }
 
     /**

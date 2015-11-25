@@ -1,4 +1,4 @@
-package util;
+package communication;
 
 public class PacketDetails {
     private long lastModified;
