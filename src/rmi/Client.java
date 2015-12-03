@@ -1,9 +1,11 @@
 package rmi;
 
 
+import exceptions.ServiceException;
 import rmi.rmi_interfaces.Interfacelist;
 import rmi.rmi_services.Add_service;
 import rmi.rmi_services.List_Service;
+import rmi.rmi_services.Service;
 
 import java.rmi.Naming;
 import java.util.Scanner;
@@ -24,30 +26,35 @@ public class Client {
 
         try {
 
-            System.out.println("Commande valide: List, Add");
-            System.out.println("Votre commande:");
             Scanner sc = new Scanner(System.in);
-
+            print();
             while (sc.hasNext()) {
                 String service = sc.nextLine();
-                if (service.equals("List")) {
-                    System.out.println("Recherche de l'objet serveur rmi://"+host+"/ListNames");
-                    List_Service list=new List_Service();
-                    list.execute();
+                Service commande;
+                try {
+                    commande = Service.getService(service);
                 }
-                if (service.equals("Add")) {
-                    Add_service add=new Add_service();
-                    add.parse(sc);
-                    add.execute();
+                catch (ServiceException e){
+                    System.out.println(e.getMessage());
+                    print();
+                    continue;
                 }
-                System.out.println("Commande valide: List, Add");
-                System.out.println("Votre commande:");
+
+                commande.parse(sc);
+                commande.execute();
+                print();
+
             }
 
         } catch(Exception e) {
             e.printStackTrace();
         }
 
+    }
+
+    public void print(){
+        System.out.println("Commande valide: List, Add");
+        System.out.println("Votre commande:");
     }
 
 
