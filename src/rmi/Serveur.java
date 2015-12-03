@@ -38,6 +38,7 @@ public class Serveur {
             String urllist = "rmi://"+"127.0.0.1"+"/ListNames";
             String urladd = "rmi://"+"127.0.0.1"+"/Ajouter";
             System.out.println("Enregistrement de l'objet avec l'url : " + urllist);
+            System.out.println("Enregistrement de l'objet avec l'url : " + urladd);
             Naming.rebind(urllist, obj);
             Naming.rebind(urladd,add);
 
