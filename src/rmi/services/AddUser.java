@@ -1,6 +1,6 @@
 package rmi.services;
 
-import rmi.interfaces.InterfaceAjouter;
+import rmi.interfaces.IAddUser;
 import util.User;
 
 import java.net.MalformedURLException;
@@ -34,9 +34,9 @@ public class AddUser extends Service {
     }
 
     public void execute(String host) throws RemoteException, MalformedURLException, NotBoundException {
-        InterfaceAjouter hello = (InterfaceAjouter) Naming.lookup("rmi://" + host + "/Ajouter");
+        IAddUser hello = (IAddUser) Naming.lookup("rmi://" + host + "/Ajouter");
         System.out.println("Invocation de la méthode");
-        String result = hello.ajouter(user.getName(), user.getNicknames());
+        String result = hello.add(user.getName(), user.getNicknames());
         System.out.println("Affichage du résultat :");
         System.out.println(result);
     }
