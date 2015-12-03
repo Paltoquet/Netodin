@@ -28,14 +28,14 @@ public class Client extends AbstractClient
      * @throws ConnectionException if the server is unreachable
      */
     public Client(String host, int port) throws ConnectionException {
-        try {
-            Socket connection = new Socket(host, port);
-            writer = new PrintWriter(connection.getOutputStream(), true);
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        } catch (IOException e) {
-           throw new ConnectionException("Unable to establish the connection");
-        }
+    try {
+        Socket connection = new Socket(host, port);
+        writer = new PrintWriter(connection.getOutputStream(), true);
+        reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+    } catch (IOException e) {
+        throw new ConnectionException("Unable to establish the connection");
     }
+}
 
     @Override
     public void run() {

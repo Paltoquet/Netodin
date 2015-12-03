@@ -10,7 +10,7 @@ public class ServeurMain {
     //start client java  -classpath remiclasse example.hello.Client
 
     public static void main(String[] args) {
-        Serveur serveur=new Serveur("127.0.0.1",Integer.parseInt(args[0]), args[1]);
+        Serveur serveur=new Serveur("127.0.0.1",1099, args[1]);
         serveur.run();
     }
 }
