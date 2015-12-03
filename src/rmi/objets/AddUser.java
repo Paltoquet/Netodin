@@ -1,7 +1,7 @@
-package rmi.rmi_objets;
+package rmi.objets;
 
 import exceptions.ModifyException;
-import rmi.rmi_interfaces.InterfaceAjouter;
+import rmi.interfaces.InterfaceAjouter;
 import server.Configuration;
 import util.User;
 
@@ -12,9 +12,9 @@ import java.util.ArrayList;
 /**
  * Created by user on 03/12/2015.
  */
-public class Ajouter extends UnicastRemoteObject implements InterfaceAjouter {
+public class AddUser extends UnicastRemoteObject implements InterfaceAjouter {
 
-    public Ajouter() throws RemoteException{
+    public AddUser() throws RemoteException{
         super();
     }
     @Override

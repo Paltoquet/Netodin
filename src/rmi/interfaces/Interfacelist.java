@@ -1,4 +1,4 @@
-package rmi.rmi_interfaces;
+package rmi.interfaces;
 
 
 

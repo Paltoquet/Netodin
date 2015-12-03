@@ -1,26 +1,21 @@
-package rmi.rmi_services;
+package rmi.services;
 
-import exceptions.ServiceException;
-import rmi.rmi_interfaces.InterfaceAjouter;
-import rmi.rmi_interfaces.Interfacelist;
+import rmi.interfaces.InterfaceAjouter;
 import util.User;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
-/**
- * Created by user on 03/12/2015.
- */
-public class Add_service extends Service {
+public class AddUser extends Service {
 
-    User user;
-    public Add_service(){
-        user=new User();
+    private User user;
+
+    public AddUser(){
+        user = new User();
     }
 
     public void parse(Scanner sc){
@@ -29,16 +24,17 @@ public class Add_service extends Service {
         if (user.getName().isEmpty()) {
             System.out.println("You must supply a name");
         }
+
         System.out.print("Nicknames (spaced by spaces) : ");
         StringTokenizer tokenizer = new StringTokenizer(sc.nextLine());
+
         while (tokenizer.hasMoreTokens()) {
             user.getNicknames().add(tokenizer.nextToken());
         }
     }
 
-    public void execute() throws RemoteException, MalformedURLException, NotBoundException {
-        InterfaceAjouter hello =
-                (InterfaceAjouter) Naming.lookup("rmi://127.0.0.1/Ajouter");
+    public void execute(String host) throws RemoteException, MalformedURLException, NotBoundException {
+        InterfaceAjouter hello = (InterfaceAjouter) Naming.lookup("rmi://" + host + "/Ajouter");
         System.out.println("Invocation de la méthode");
         String result = hello.ajouter(user.getName(), user.getNicknames());
         System.out.println("Affichage du résultat :");

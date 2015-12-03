@@ -1,12 +1,16 @@
 package rmi;
 
-/**
- * Created by user on 03/12/2015.
- */
-public class ClientMain {
 
+public class ClientMain
+{
     public static void main(String[] args) {
-        Client c=new Client(args[0]);
-        c.run();
+        String host = "127.0.0.1";
+        if (args.length == 1) {
+            host = args[0];
+        } else if (args.length > 1) {
+            System.err.println("Usage : ./client.jar host");
+        }
+
+        (new Client(host)).run();
     }
 }

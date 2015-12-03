@@ -1,9 +1,7 @@
-package rmi.rmi_objets;
+package rmi.objets;
 
-import rmi.rmi_interfaces.Interfacelist;
+import rmi.interfaces.Interfacelist;
 import server.Configuration;
-import server.commands.Command;
-import server.commands.ListUsers;
 import util.Users;
 
 import java.rmi.RemoteException;
@@ -13,9 +11,9 @@ import java.util.ArrayList;
 /**
  * Created by user on 01/12/2015.
  */
-public class ListNames extends UnicastRemoteObject implements Interfacelist {
+public class ListUsers extends UnicastRemoteObject implements Interfacelist {
 
-    public ListNames() throws RemoteException{
+    public ListUsers() throws RemoteException{
         super();
     }
     @Override
